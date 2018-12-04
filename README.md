@@ -1,10 +1,11 @@
-### This file is used to track progress of face recognition part.
+### This file is used to track the progress.
 
-+ The prototype is still buggy and need to be fixed.
-+ use command `python main.py` to run face recognition with siamese network prototype.
++ This project will be synchronized with the origin face recognition of origin project.
++ Trained model will be saved as trainedmodel.pt.
++ Use `runTest()` function for testing model.
 + ~~Dataset available from https://github.com/StephenMilborrow/muct.git~~
 + New dataset available from http://mmlab.ie.cuhk.edu.hk/projects/CelebA.html
-+ Need to create a trainset/testset/validset csv/txt file before training which include names of all images.
++ Need to create a trainset/testset/validset csv/txt file before training which include names and labels of images.
 + File format as `IMAGE_NAME IMAGE_LABEL` in each line
 
 If program crashes, try to reduce `BATCH_SIZE`.
@@ -26,3 +27,9 @@ If program crashes, try to reduce `BATCH_SIZE`.
 + skimage
 + numpy
 + pandas
+
+
+## Statement
++ The origin of this project is from one of my second year module in University of Nottingham.
++ That project focus on build a real time face recognition application for low quality video/CCTV.
++ This is face recognition part of that origin project, all writen by author.
