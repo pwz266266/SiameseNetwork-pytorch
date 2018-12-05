@@ -1,14 +1,14 @@
-### This file is used to track the progress.
+### This file is used to track progress of face recognition part.
 
-+ This project will be synchronized with the origin face recognition of origin project.
-+ Trained model will be saved as trainedmodel.pt.
-+ Use `runTest()` function for testing model.
++ The prototype is still buggy and need to be fixed.
++ use command `python main.py` to run face recognition with siamese network prototype.
 + ~~Dataset available from https://github.com/StephenMilborrow/muct.git~~
 + New dataset available from http://mmlab.ie.cuhk.edu.hk/projects/CelebA.html
-+ Need to create a trainset/testset/validset csv/txt file before training which include names and labels of images.
++ Need to create a trainset/testset/validset csv/txt file before training which include names of all images.
 + File format as `IMAGE_NAME IMAGE_LABEL` in each line
++ Network contains 11 conv + 4 pooling + 2 maxout + 2 fc layers.
 
-If program crashes, try to reduce `BATCH_SIZE`.
+If program crashes, try to reduce `BATCH_SIZE`, require roughly 11G memory for BATCH_SIZE=130.
 
 ## TODO
 + Add validation step
@@ -27,6 +27,7 @@ If program crashes, try to reduce `BATCH_SIZE`.
 + skimage
 + numpy
 + pandas
+
 
 
 ## Statement

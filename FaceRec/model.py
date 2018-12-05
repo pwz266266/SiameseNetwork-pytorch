@@ -4,6 +4,23 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+class Maxout(nn.Module):
+
+    def __init__(self, in_size, out_size, pool_size):
+        super().__init__()
+        self.in_size, self.out_size, self.pool_size = in_size, out_size, pool_size
+        self.lin = nn.Linear(in_size, out_size * pool_size)
+
+
+    def forward(self, inputs):
+        shape = list(inputs.size())
+        shape[-1] = self.out_size
+        shape.append(self.pool_size)
+        max_dim = len(shape) - 1
+        out = self.lin(inputs)
+        m, i = out.view(*shape).max(max_dim)
+        return m
+
 class SiameseNetwork(nn.Module):
     def __init__(self):
         super(SiameseNetwork, self).__init__()
@@ -12,33 +29,52 @@ class SiameseNetwork(nn.Module):
         #            x input channels
         #            y output channels
         #            z*z filter
-        self.conv1 = nn.Conv2d(3,4,2)
-        self.conv2 = nn.Conv2d(4,6,2)
-        self.conv3 = nn.Conv2d(6,9,2)
-        self.conv4 = nn.Conv2d(9,12,3)
-        self.conv5 = nn.Conv2d(12,14,3)
+        self.model1 = nn.Sequential(
+        nn.Conv2d(3,64,7,stride=2,padding=3),
+        nn.MaxPool2d(3,stride=2,padding=1)
+        )
 
-        # Linear(x,y) function to build fully connected layer.
-        self.fc1 = nn.Linear(3276, 1240)
-        self.fc2 = nn.Linear(1240, 640)
-        self.fc3 = nn.Linear(640, 100)
+        self.model2 = nn.Sequential(
+        nn.Conv2d(64,64,1,stride=1),
+        nn.Conv2d(64,192,3,stride=1,padding=1)
+        )
+
+        self.model3 = nn.Sequential(
+        nn.MaxPool2d(3,stride=2,padding=1),
+        nn.Conv2d(192,192,1,stride=1),
+        nn.Conv2d(192,384,3,stride=1,padding=1),
+        nn.MaxPool2d(3,stride=2,padding=1),
+        nn.Conv2d(384,384,1,stride=1),
+        nn.Conv2d(384,256,3,stride=1,padding=1),
+        nn.Conv2d(256,256,1,stride=1),
+        nn.Conv2d(256,256,3,stride=1,padding=1),
+        nn.Conv2d(256,256,1,stride=1),
+        nn.Conv2d(256,256,3,stride=1,padding=1),
+        nn.MaxPool2d(3,stride=2,padding=1)
+        )
+
+        self.model4 = nn.Sequential(
+        Maxout(7*7*256, 1*32*128, 2),
+        Maxout(1*32*128, 1*32*128, 2),
+        nn.Linear(1*32*128, 1*1*128),
+        nn.Linear(128,128)
+        )
+
 
     #Fucntion to feed forward
 
     def forward(self, x): #Go through network once
         # Max pooling over a (2, 2) window
         x = x.type('torch.cuda.FloatTensor')
-        x = F.max_pool2d(F.relu(self.conv1(x)), 2)
-        x = F.max_pool2d(F.relu(self.conv2(x)), 2)
-        x = F.max_pool2d(F.relu(self.conv3(x)), 2)
-        x = F.max_pool2d(F.relu(self.conv4(x)), 2)
-        x = F.max_pool2d(F.relu(self.conv5(x)), 2)
-
-
+        x = F.normalize(x)
+        x = self.model1(x)
+        x = F.normalize(x)
+        x = self.model2(x)
+        x = F.normalize(x)
+        x = self.model3(x)
         x = x.view(-1, self.num_flat_features(x))
-        x = F.relu(self.fc1(x))
-        x = F.relu(self.fc2(x))
-        x = self.fc3(x)
+        x = self.model4(x)
+
         return x
 
     def forward_triple(self, anchor, positive, negative): #Use for computing triplet loss
