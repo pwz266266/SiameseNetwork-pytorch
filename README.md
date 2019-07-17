@@ -1,3 +1,5 @@
+## This repo is archived due to open source version of the original project will be uploaded and maintained.
+
 ### This file is used to track progress of face recognition part.
 
 + The prototype is still buggy and need to be fixed.
